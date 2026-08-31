@@ -1,72 +1,109 @@
 import { supabase } from "./supabase"
 
-export const signUp = async (email: string, password: string, name: string) => {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        name,
-      },
-    },
-  })
-
-  if (error) throw error
-
-  // Create user profile
-  if (data.user) {
-    const { error: profileError } = await supabase.from("users").insert({
-      id: data.user.id,
+export async function signUp(
+  email: string,
+  password: string,
+  name: string
+): Promise<any> {
+  try {
+    // Sign up with Supabase Auth
+    const { data, error } = await supabase.auth.signUp({
       email,
-      name,
-      role: "customer",
-      coins: 0,
-      referral_code: generateReferralCode(),
+      password,
+      options: {
+        data: {
+          name,
+        },
+      },
     })
 
-    if (profileError) throw profileError
+    if (error) throw error
+
+    if (data.user) {
+      // Create user profile
+      const { error: profileError } = await supabase.from("users").insert({
+        id: data.user.id,
+        email,
+        name,
+        role: "customer",
+        referral_code: `REF_${Math.random().toString(36).substring(7).toUpperCase()}`,
+      })
+
+      if (profileError) throw profileError
+    }
+
+    return data
+  } catch (error: any) {
+    throw new Error(error.message || "Sign up failed")
   }
-
-  return data
 }
 
-export const signIn = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  })
+export async function signIn(
+  email: string,
+  password: string
+): Promise<any> {
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
 
-  if (error) throw error
-  return data
+    if (error) throw error
+
+    return data
+  } catch (error: any) {
+    throw new Error(error.message || "Sign in failed")
+  }
 }
 
-export const signInWithGoogle = async () => {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
-    },
-  })
-
-  if (error) throw error
-  return data
+export async function signOut(): Promise<void> {
+  try {
+    const { error } = await supabase.auth.signOut()
+    if (error) throw error
+  } catch (error: any) {
+    throw new Error(error.message || "Sign out failed")
+  }
 }
 
-export const signOut = async () => {
-  const { error } = await supabase.auth.signOut()
-  if (error) throw error
+export async function getCurrentUser(): Promise<any> {
+  try {
+    const { data } = await supabase.auth.getUser()
+    return data.user
+  } catch (error: any) {
+    throw new Error(error.message || "Failed to get current user")
+  }
 }
 
-export const getCurrentUser = async () => {
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser()
+export async function getUserProfile(userId: string): Promise<any> {
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", userId)
+      .single()
 
-  if (error) throw error
-  return user
+    if (error) throw error
+    return data
+  } catch (error: any) {
+    throw new Error(error.message || "Failed to get user profile")
+  }
 }
 
-export const generateReferralCode = () => {
-  return Math.random().toString(36).substring(2, 10).toUpperCase()
+export async function updateUserProfile(
+  userId: string,
+  updates: any
+): Promise<any> {
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .update(updates)
+      .eq("id", userId)
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
+  } catch (error: any) {
+    throw new Error(error.message || "Failed to update profile")
+  }
 }
