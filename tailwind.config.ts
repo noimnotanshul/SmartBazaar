@@ -1,59 +1,122 @@
-import type { Config } from "tailwindcss"
-import defaultTheme from "tailwindcss/defaultTheme"
+import type { Config } from 'tailwindcss'
+import defaultTheme from 'tailwindcss/defaultTheme'
 
-const config = {
-  darkMode: ["class"],
+const config: Config = {
+  darkMode: ['class'],
   content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
     extend: {
       colors: {
-        saffron: "#FF9933",
-        "india-blue": "#2874F0",
-        "india-green": "#388E3C",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        card: "hsl(var(--card))",
-        "card-foreground": "hsl(var(--card-foreground))",
-        primary: "hsl(var(--primary))",
-        "primary-foreground": "hsl(var(--primary-foreground))",
-        secondary: "hsl(var(--secondary))",
-        "secondary-foreground": "hsl(var(--secondary-foreground))",
-        destructive: "hsl(var(--destructive))",
-        "destructive-foreground": "hsl(var(--destructive-foreground))",
-        muted: "hsl(var(--muted))",
-        "muted-foreground": "hsl(var(--muted-foreground))",
-        accent: "hsl(var(--accent))",
-        "accent-foreground": "hsl(var(--accent-foreground))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
+        saffron: {
+          50: '#fff8f0',
+          100: '#ffedd5',
+          200: '#ffd9a5',
+          300: '#ffc275',
+          400: '#ffaa45',
+          500: '#ff9933',
+          600: '#e67e22',
+          700: '#cc6622',
+          800: '#994411',
+          900: '#662200',
+        },
+        'india-blue': {
+          50: '#f0f4ff',
+          100: '#e0e9ff',
+          200: '#c1d3ff',
+          300: '#a2bdff',
+          400: '#7a9eff',
+          500: '#2874f0',
+          600: '#1e54cc',
+          700: '#1440b3',
+          800: '#0a2c8a',
+          900: '#051861',
+        },
+        'india-green': {
+          50: '#f1f8f5',
+          100: '#e0f2ed',
+          200: '#c1e5db',
+          300: '#9dd5c4',
+          400: '#5db89f',
+          500: '#388e3c',
+          600: '#2d7a33',
+          700: '#22642a',
+          800: '#174c1f',
+          900: '#0c3415',
+        },
+        border: 'hsl(var(--border))',
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))',
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+        primary: {
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
+        },
+        secondary: {
+          DEFAULT: 'hsl(var(--secondary))',
+          foreground: 'hsl(var(--secondary-foreground))',
+        },
+        destructive: {
+          DEFAULT: 'hsl(var(--destructive))',
+          foreground: 'hsl(var(--destructive-foreground))',
+        },
+        muted: {
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))',
+        },
+        accent: {
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))',
+        },
+        card: {
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))',
+        },
+      },
+      borderRadius: {
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
       },
       fontFamily: {
-        sans: ["Poppins", "Noto Sans Devanagari", ...defaultTheme.fontFamily.sans],
-      },
-      backgroundImage: {
-        "block-print": "url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"40\" height=\"40\"><rect width=\"20\" height=\"20\" fill=\"%23FF9933\" opacity=\"0.05\"/><rect x=\"20\" width=\"20\" height=\"20\" fill=\"%232874F0\" opacity=\"0.05\"/><rect y=\"20\" width=\"20\" height=\"20\" fill=\"%232874F0\" opacity=\"0.05\"/><rect x=\"20\" y=\"20\" width=\"20\" height=\"20\" fill=\"%23388E3C\" opacity=\"0.05\"/></svg>')",
+        sans: ['Poppins', 'Noto Sans Devanagari', ...defaultTheme.fontFamily.sans],
       },
       keyframes: {
-        "spin-wheel": {
-          "0%": { transform: "rotate(0deg)" },
-          "100%": { transform: "rotate(360deg)" },
+        'accordion-down': {
+          from: { height: '0' },
+          to: { height: 'var(--radix-accordion-content-height)' },
         },
-        "scratch-off": {
-          "0%": { opacity: "1" },
-          "100%": { opacity: "0" },
+        'accordion-up': {
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: '0' },
+        },
+        'fade-in': {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
+        'slide-in-up': {
+          from: {
+            opacity: '0',
+            transform: 'translateY(20px)',
+          },
+          to: {
+            opacity: '1',
+            transform: 'translateY(0)',
+          },
         },
       },
       animation: {
-        "spin-wheel": "spin-wheel 3s linear",
-        "scratch-off": "scratch-off 0.5s ease-out",
+        'accordion-down': 'accordion-down 0.2s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out',
+        'fade-in': 'fade-in 0.5s ease-in',
+        'slide-in-up': 'slide-in-up 0.5s ease-out',
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
-} satisfies Config
-
+  plugins: [],
+}
 export default config
