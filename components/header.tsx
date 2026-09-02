@@ -6,6 +6,7 @@ import { useAuthStore, useCartStore } from "@/lib/store"
 import { Button } from "@/components/ui/button"
 import { ShoppingCart, User, Menu, X } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
+
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { user } = useAuthStore()
