@@ -257,7 +257,7 @@ This project is licensed under the MIT License - see LICENSE file for details.
 
 For support, email support@smartbazaar.com or open an issue on GitHub.
 
-## 🌟 Roadmap
+ ## 🌟 Roadmap
 
 - [ ] Mobile app (React Native)
 - [ ] Advanced AR try-on
