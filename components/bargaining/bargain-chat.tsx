@@ -5,44 +5,63 @@ import { Product } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { processUserOffer, calculateFloorPrice } from "@/lib/ai-bargaining"
-import { MessageCircle } from "lucide-react"
+import { processUserOffer, calculateFloorPrice, extractOfferFromText } from "@/lib/ai-bargaining"
+import { MessageCircle, CheckCircle } from "lucide-react"
 
-export function BargainChat({ product }: { product: Product }) {
+export function BargainChat({
+  product,
+  onPriceAgreed,
+}: {
+  product: Product
+  onPriceAgreed?: (price: number) => void
+}) {
   const [open, setOpen] = useState(false)
-  const [offer, setOffer] = useState("")
+  const [message, setMessage] = useState("")
   const [chatLog, setChatLog] = useState<Array<{ role: string; content: string }>>([
     {
       role: "assistant",
-      content: `Namaskar! 🙏 Main hoon Bhaiya Ji. Tum is ${product.name} ko bargain karna chahte ho? Dekho, normal price to ₹${product.mrp} hai, par hum dere rahe hain ₹${product.price} mein. Kya yeh price theek hai tumhare liye?`,
+      content: `Namaskar! 🙏 Main hoon Bhaiya Ji. Is ${product.name} ka listed price ₹${product.price} hai (MRP ₹${product.mrp}). Aap apna offer bataiye, milkar deal karte hain!`,
     },
   ])
   const [loading, setLoading] = useState(false)
+  const [agreedPrice, setAgreedPrice] = useState<number | null>(null)
 
   const handleBargain = async () => {
-    if (!offer) return
+    if (!message.trim() || agreedPrice !== null) return
 
-    const userOffer = parseInt(offer)
+    const userOffer = extractOfferFromText(message)
+
+    if (userOffer === null) {
+      setChatLog((prev) => [
+        ...prev,
+        { role: "user", content: message },
+        {
+          role: "assistant",
+          content: `Maaf kijiye, mujhe aapka offer wala amount samajh nahi aaya. Kripya ek number ke sath bataiye, jaise "800 mein de do".`,
+        },
+      ])
+      setMessage("")
+      return
+    }
+
     const floorPrice = calculateFloorPrice(product.price)
 
-    setChatLog((prev) => [
-      ...prev,
-      { role: "user", content: `My offer: ₹${userOffer}` },
-    ])
-    setOffer("")
+    setChatLog((prev) => [...prev, { role: "user", content: message }])
+    setMessage("")
     setLoading(true)
 
     try {
-      const response = processUserOffer(
-        userOffer,
-        product.price,
-        floorPrice
-      )
+      const response = processUserOffer(userOffer, product.price, floorPrice)
 
       setChatLog((prev) => [
         ...prev,
         { role: "assistant", content: response.message },
       ])
+
+      if (response.accepted && response.newPrice) {
+        setAgreedPrice(response.newPrice)
+        onPriceAgreed?.(response.newPrice)
+      }
     } catch (error) {
       console.error("Bargaining error:", error)
     } finally {
@@ -67,6 +86,15 @@ export function BargainChat({ product }: { product: Product }) {
             <CardTitle className="text-base">Bargain with Bhaiya Ji 🤝</CardTitle>
           </CardHeader>
           <CardContent>
+            {agreedPrice !== null && (
+              <div className="mb-4 p-3 bg-green-100 dark:bg-green-900/30 border border-green-400 rounded-lg flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+                <span className="font-semibold text-green-700 dark:text-green-400">
+                  Deal fix ho gaya! Final price: ₹{agreedPrice}
+                </span>
+              </div>
+            )}
+
             <div className="h-64 overflow-y-auto mb-4 space-y-3 bg-muted/50 p-4 rounded">
               {chatLog.map((msg, idx) => (
                 <div
@@ -90,22 +118,31 @@ export function BargainChat({ product }: { product: Product }) {
               ))}
             </div>
 
-            <div className="space-y-2">
-              <Input
-                type="number"
-                placeholder={`Enter your offer (min: ₹${Math.round(product.price * 0.7)})`}
-                value={offer}
-                onChange={(e) => setOffer(e.target.value)}
-                disabled={loading}
-              />
-              <Button
-                onClick={handleBargain}
-                disabled={!offer || loading}
-                className="w-full"
-              >
-                {loading ? "Bargaining..." : "Make Offer"}
-              </Button>
-            </div>
+            {agreedPrice === null ? (
+              <div className="space-y-2">
+                <Input
+                  type="text"
+                  placeholder="Apna offer likhiye, jaise: 800 mein de do"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleBargain()
+                  }}
+                  disabled={loading}
+                />
+                <Button
+                  onClick={handleBargain}
+                  disabled={!message.trim() || loading}
+                  className="w-full"
+                >
+                  {loading ? "Bargaining..." : "Send Offer"}
+                </Button>
+              </div>
+            ) : (
+              <p className="text-sm text-center text-muted-foreground">
+                Deal ho chuki hai! Ab "Add to Cart" par is final price ke sath order kar sakte hain.
+              </p>
+            )}
           </CardContent>
         </Card>
       )}
