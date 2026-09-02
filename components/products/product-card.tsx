@@ -6,7 +6,7 @@ import { Product } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { formatCurrency, calculateDiscount } from "@/lib/utils"
-import { Heart, ShoppingCart } from "lucide-react"
+import { ShoppingCart } from "lucide-react"
 import { useCartStore } from "@/lib/store"
 
 export function ProductCard({ product }: { product: Product }) {
