@@ -109,7 +109,7 @@ export function ProductDetail({ productId }: { productId: string }) {
                 </div>
               )}
 
-              {product.colors.length > 0 && (
+              {product.colors && product.colors.length > 0 && (
                 <div>
                   <p className="text-sm font-medium mb-2">Color</p>
                   <div className="flex gap-2">
