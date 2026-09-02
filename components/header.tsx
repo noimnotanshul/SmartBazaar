@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useState } from "react"
 import { useAuthStore, useCartStore } from "@/lib/store"
 import { Button } from "@/components/ui/button"
-import { Heart, ShoppingCart, User, Menu, X } from "lucide-react"
+import { ShoppingCart, User, Menu, X } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 
 export function Header() {
