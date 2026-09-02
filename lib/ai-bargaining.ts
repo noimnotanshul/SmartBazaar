@@ -1,6 +1,6 @@
 /**
  * AI Bargaining Logic for SmartBazaar
- * Simulates a realistic negotiation experience with Bhaiya Ji character
+ * Simulates a respectful negotiation experience with Bhaiya Ji character
  */
 
 export function processUserOffer(
@@ -8,34 +8,33 @@ export function processUserOffer(
   currentPrice: number,
   floorPrice: number
 ): { accepted: boolean; message: string; newPrice?: number } {
-  const priceGap = currentPrice - userOffer
   const possibleDiscount = currentPrice - floorPrice
-  const discountPercentage = (priceGap / currentPrice) * 100
 
-  // If offer matches or exceeds floor price
+  // If offer is more than or equal to the listed price — politely decline the excess
   if (userOffer >= currentPrice) {
     return {
-      accepted: false,
-      message: `Oye! 😄 Tum sabse zyada chahte ho. Mujhe bhi margain karna hai! Ye price already best hai. Lelo abhi!`,
+      accepted: true,
+      message: `Arre nahi ji, itna zyada dene ki koi zaroorat nahi hai! 😊 Aapki niyat achhi hai, lekin hum aapse extra nahi lenge. Actual price ₹${currentPrice} hi sahi hai — isi mein deal fix karte hain!`,
+      newPrice: currentPrice,
     }
   }
 
   // If offer is reasonable (70-85% of current price)
   if (userOffer >= currentPrice * 0.7 && userOffer < currentPrice * 0.85) {
-    const newPrice = Math.ceil(userOffer + (possibleDiscount * 0.3))
+    const newPrice = Math.ceil(userOffer + possibleDiscount * 0.3)
     return {
       accepted: false,
-      message: `Accha accha, tum samajhdar ho! 🤔 Sunno... aise kaise? ₹${newPrice} par de du? Ya iska matlab ye hai ki mujhe aur bargaining karna padega?`,
+      message: `Aapne accha offer diya hai ji 🤔 Lekin thoda aur badhaiye. Main ₹${newPrice} tak de sakta hoon — isse kam mushkil hai. Bataiye, theek hai?`,
       newPrice,
     }
   }
 
   // If offer is within reasonable range (85-95% of current price)
   if (userOffer >= currentPrice * 0.85 && userOffer < currentPrice * 0.95) {
-    const newPrice = Math.ceil(userOffer + (possibleDiscount * 0.15))
+    const newPrice = Math.ceil(userOffer + possibleDiscount * 0.15)
     return {
       accepted: false,
-      message: `Wah! 😊 Tu to sachme khush rakhna chahta hai. Dekh, ₹${newPrice} last offer. Isse kam nahi kar sakta bhai!`,
+      message: `Wah, aap to sahi mol-bhaav karte hain! 😊 Chaliye ₹${newPrice} final kar dete hain — isse neeche mushkil hai bhai sahab.`,
       newPrice,
     }
   }
@@ -44,7 +43,7 @@ export function processUserOffer(
   if (userOffer >= currentPrice * 0.95) {
     return {
       accepted: true,
-      message: `🎉 Bilkul! Deal kar lete hain! ₹${userOffer} pe le de! Tum to sach mein smart ho!`,
+      message: `🎉 Bilkul theek hai ji! ₹${userOffer} mein deal pakki! Aapse dobara business karna acha lagega.`,
       newPrice: userOffer,
     }
   }
@@ -52,32 +51,21 @@ export function processUserOffer(
   // If offer is too low (below 70%)
   return {
     accepted: false,
-    message: `Arrey! 😤 Kya kar raha hai tu? Ye price to mera khoon pi jayega! Kam se kam ₹${Math.ceil(
+    message: `Arre ji, itne mein to lagat bhi nahi nikalti! 🙏 Thoda samjhiye, kam se kam ₹${Math.ceil(
       currentPrice * 0.85
-    )} to de. Usske bhi kam nahi! 🙅`,
+    )} to deni hi padegi. Isse kam mushkil hoga.`,
   }
 }
 
 export function calculateFloorPrice(sellingPrice: number): number {
-  // Floor price is typically 60-70% of selling price
-  // This ensures seller still makes a profit
+  // Floor price is typically 65% of selling price
   return Math.ceil(sellingPrice * 0.65)
 }
 
-export function generateBargainingResponse(
-  userOffer: number,
-  productName: string,
-  currentPrice: number
-): string {
-  const responses = [
-    `Bhaiya, ye ${productName} ka price bahut jyada lagta hai. Kya discount de sakte ho?`,
-    `Uncle, last month to same product ${Math.ceil(
-      currentPrice * 0.9
-    )} mein mila tha. Ab kyu mehenga kar diya?`,
-    `Dada, student hun. Thoda kam kar do na. Padhai bhi chalti rahegi!`,
-    `Anpadh hoon! Discount baat sun raha hun, samajh bhi le.`,
-  ]
-  return responses[Math.floor(Math.random() * responses.length)]
+export function extractOfferFromText(message: string): number | null {
+  // Extracts the first number found in a free-text message
+  const match = message.replace(/,/g, "").match(/\d+/)
+  return match ? parseInt(match[0]) : null
 }
 
 export interface BargainState {
