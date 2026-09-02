@@ -92,7 +92,7 @@ export function ProductDetail({ productId }: { productId: string }) {
                 </div>
               </div>
 
-              {product.sizes.length > 0 && (
+              {product.sizes && product.sizes.length > 0 &&
                 <div>
                   <p className="text-sm font-medium mb-2">Size</p>
                   <div className="flex gap-2">
