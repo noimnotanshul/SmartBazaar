@@ -6,7 +6,7 @@ import { Product } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { formatCurrency, generateShareLink } from "@/lib/utils"
+import { generateShareLink } from "@/lib/utils"
 import { Users } from "lucide-react"
 
 export function GroupBuyingWidget({ product }: { product: Product }) {
