@@ -110,7 +110,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-saffron rounded-full;
+  @apply bg-orange-500 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
