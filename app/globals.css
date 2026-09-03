@@ -1,118 +1,70 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
-  --card: 0 0% 100%;
-  --card-foreground: 222.2 84% 4.9%;
-  --primary: 47.9 100% 52.4%;
-  --primary-foreground: 222.2 47.6% 11.2%;
-  --secondary: 217.2 91.2% 59.8%;
-  --secondary-foreground: 222.2 47.6% 11.2%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
-  --muted: 210 40% 96%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-  --accent: 47.9 100% 52.4%;
-  --accent-foreground: 222.2 47.6% 11.2%;
-  --input: 214.3 31.8% 91.4%;
-  --ring: 47.9 100% 52.4%;
-}
-
-.dark {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-  --card: 222.2 84% 4.9%;
-  --card-foreground: 210 40% 98%;
-  --primary: 47.9 100% 52.4%;
-  --primary-foreground: 222.2 47.6% 11.2%;
-  --secondary: 217.2 91.2% 59.8%;
-  --secondary-foreground: 222.2 47.6% 11.2%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 222.2 47.6% 11.2%;
-  --muted: 217.2 32.6% 17.5%;
-  --muted-foreground: 215 20.2% 65.1%;
-  --accent: 47.9 100% 52.4%;
-  --accent-foreground: 222.2 47.6% 11.2%;
-  --input: 217.2 32.6% 17.5%;
-  --ring: 47.9 100% 52.4%;
-}
-
-* {
-  @apply border-border;
-}
-
-body {
-  @apply bg-background text-foreground;
-}
-
-/* Indian block print pattern */
-.pattern-block {
-  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><defs><pattern id="dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="2" fill="%23FF9933" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23dots)"/></svg>');
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 24 100% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 24 100% 60%;
+    --radius: 0.75rem;
   }
-  to {
-    opacity: 1;
+
+  .dark {
+    --background: 240 10% 6%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 8%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 8%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 24 100% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 4% 16%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 4% 16%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 4% 16%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 4% 16%;
+    --input: 240 4% 16%;
+    --ring: 24 100% 55%;
   }
 }
 
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+@layer base {
+  * {
+    @apply border-border;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-poppins), system-ui, sans-serif;
   }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-in;
+.text-saffron {
+  color: #FF9933;
 }
-
-.animate-slide-in-up {
-  animation: slideInUp 0.5s ease-out;
+.bg-saffron {
+  background-color: #FF9933;
 }
-
-.animate-slide-in-down {
-  animation: slideInDown 0.5s ease-out;
-}
-
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-muted;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-orange-500 rounded-full;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-secondary;
+.fill-saffron {
+  fill: #FF9933;
 }
