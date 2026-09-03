@@ -1,151 +1,169 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Product } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { processUserOffer, calculateFloorPrice, extractOfferFromText } from "@/lib/ai-bargaining"
-import { MessageCircle, CheckCircle } from "lucide-react"
+import { processUserOffer, calculateFloorPrice } from "@/lib/ai-bargaining"
+import { useCartStore } from "@/lib/store"
+import { MessageCircle, X, Send } from "lucide-react"
+import { toast } from "sonner"
+import { formatCurrency } from "@/lib/utils"
 
-export function BargainChat({
-  product,
-  onPriceAgreed,
-}: {
-  product: Product
-  onPriceAgreed?: (price: number) => void
-}) {
+export function BargainChat({ product }: { product: Product }) {
   const [open, setOpen] = useState(false)
-  const [message, setMessage] = useState("")
-  const [chatLog, setChatLog] = useState<Array<{ role: string; content: string }>>([
+  const [offer, setOffer] = useState("")
+  const [chatLog, setChatLog] = useState([
     {
       role: "assistant",
-      content: `Namaskar! 🙏 Main hoon Bhaiya Ji. Is ${product.name} ka listed price ₹${product.price} hai (MRP ₹${product.mrp}). Aap apna offer bataiye, milkar deal karte hain!`,
+      content: `Namaste ji 🙏 Main hoon Bhaiya Ji. Aap \( {product.name} dekh rahe hain. Iska price ₹ \){product.price} hai. Kya aap isme bargain karna chahte hain?`,
     },
   ])
   const [loading, setLoading] = useState(false)
-  const [agreedPrice, setAgreedPrice] = useState<number | null>(null)
+  const [dealDone, setDealDone] = useState(false)
+  const [finalPrice, setFinalPrice] = useState<number | null>(null)
+  const { addItem } = useCartStore()
+  const bottomRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [chatLog, loading])
 
   const handleBargain = async () => {
-    if (!message.trim() || agreedPrice !== null) return
+    if (!offer || dealDone) return
 
-    const userOffer = extractOfferFromText(message)
-
-    if (userOffer === null) {
-      setChatLog((prev) => [
-        ...prev,
-        { role: "user", content: message },
-        {
-          role: "assistant",
-          content: `Maaf kijiye, mujhe aapka offer wala amount samajh nahi aaya. Kripya ek number ke sath bataiye, jaise "800 mein de do".`,
-        },
-      ])
-      setMessage("")
+    const userOffer = parseInt(offer)
+    if (isNaN(userOffer) || userOffer <= 0) {
+      toast.error("Sahi price daaliye")
       return
     }
 
-    const floorPrice = calculateFloorPrice(product.price)
-
-    setChatLog((prev) => [...prev, { role: "user", content: message }])
-    setMessage("")
+    setChatLog((prev) => [...prev, { role: "user", content: `Mera offer: ₹${userOffer}` }])
+    setOffer("")
     setLoading(true)
 
-    try {
-      const response = processUserOffer(userOffer, product.price, floorPrice)
+    // Thoda delay (typing effect)
+    await new Promise((r) => setTimeout(r, 1000))
 
-      setChatLog((prev) => [
-        ...prev,
-        { role: "assistant", content: response.message },
-      ])
+    const floor = calculateFloorPrice(product.price)
+    const response = processUserOffer(userOffer, product.price, floor)
 
-      if (response.accepted && response.newPrice) {
-        setAgreedPrice(response.newPrice)
-        onPriceAgreed?.(response.newPrice)
-      }
-    } catch (error) {
-      console.error("Bargaining error:", error)
-    } finally {
-      setLoading(false)
+    setChatLog((prev) => [...prev, { role: "assistant", content: response.message }])
+
+    if (response.accepted && response.newPrice) {
+      setDealDone(true)
+      setFinalPrice(response.newPrice)
+
+      addItem({
+        product_id: product.id,
+        quantity: 1,
+        price: product.price,
+        bargained_price: response.newPrice,
+      })
+
+      toast.success(`Deal lock! ${formatCurrency(response.newPrice)}`)
     }
+
+    setLoading(false)
   }
 
   return (
-    <div>
+    <>
       <Button
         variant="outline"
-        className="w-full mb-4"
-        onClick={() => setOpen(!open)}
+        className="w-full h-12 border-2 border-[#FF9933] text-[#FF9933] hover:bg-[#FF9933] hover:text-white font-semibold"
+        onClick={() => setOpen(true)}
       >
-        <MessageCircle className="h-4 w-4 mr-2" />
-        {open ? "Close Bargain Chat" : "Start Bargaining"}
+        <MessageCircle className="h-5 w-5 mr-2" />
+        Bargain with Bhaiya Ji
       </Button>
 
       {open && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Bargain with Bhaiya Ji 🤝</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {agreedPrice !== null && (
-              <div className="mb-4 p-3 bg-green-100 dark:bg-green-900/30 border border-green-400 rounded-lg flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-                <span className="font-semibold text-green-700 dark:text-green-400">
-                  Deal fix ho gaya! Final price: ₹{agreedPrice}
-                </span>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50">
+          <div className="bg-background w-full sm:max-w-md sm:rounded-2xl shadow-2xl flex flex-col h-[85vh] sm:h-[600px]">
+            
+            {/* Header */}
+            <div className="bg-gradient-to-r from-[#FF9933] to-[#FF6B00] text-white p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-xl">
+                  🙏
+                </div>
+                <div>
+                  <p className="font-semibold">Bhaiya Ji</p>
+                  <p className="text-xs opacity-90">Online</p>
+                </div>
               </div>
-            )}
+              <button onClick={() => setOpen(false)}>
+                <X className="h-5 w-5" />
+              </button>
+            </div>
 
-            <div className="h-64 overflow-y-auto mb-4 space-y-3 bg-muted/50 p-4 rounded">
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {chatLog.map((msg, idx) => (
                 <div
                   key={idx}
-                  className={`text-sm ${
-                    msg.role === "user"
-                      ? "text-right text-primary"
-                      : "text-left text-muted-foreground"
-                  }`}
+                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
-                  <span
-                    className={`inline-block px-3 py-2 rounded-lg ${
+                  <div
+                    className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm ${
                       msg.role === "user"
-                        ? "bg-primary text-white"
-                        : "bg-background border"
+                        ? "bg-[#FF9933] text-white"
+                        : "bg-muted"
                     }`}
                   >
                     {msg.content}
-                  </span>
+                  </div>
                 </div>
               ))}
+
+              {loading && (
+                <div className="flex justify-start">
+                  <div className="bg-muted px-4 py-3 rounded-2xl text-sm">
+                    Bhaiya Ji typing...
+                  </div>
+                </div>
+              )}
+
+              {dealDone && finalPrice && (
+                <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
+                  <p className="text-sm text-green-700 mb-1">Deal Confirmed!</p>
+                  <p className="text-3xl font-bold text-green-600">
+                    {formatCurrency(finalPrice)}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">Cart mein add ho gaya</p>
+                </div>
+              )}
+
+              <div ref={bottomRef} />
             </div>
 
-            {agreedPrice === null ? (
-              <div className="space-y-2">
+            {/* Input */}
+            {!dealDone && (
+              <div className="p-3 border-t flex gap-2">
                 <Input
-                  type="text"
-                  placeholder="Apna offer likhiye, jaise: 800 mein de do"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
+                  type="number"
+                  placeholder="Apna offer likhiye (₹)"
+                  value={offer}
+                  onChange={(e) => setOffer(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") handleBargain()
                   }}
+                  className="h-11"
                   disabled={loading}
                 />
                 <Button
                   onClick={handleBargain}
-                  disabled={!message.trim() || loading}
-                  className="w-full"
+                  disabled={!offer || loading}
+                  className="h-11 px-4 bg-[#FF9933] hover:bg-[#E67E00]"
                 >
-                  {loading ? "Bargaining..." : "Send Offer"}
+                  <Send className="h-4 w-4" />
                 </Button>
               </div>
-            ) : (
-              <p className="text-sm text-center text-muted-foreground">
-                Deal ho chuki hai! Ab "Add to Cart" par is final price ke sath order kar sakte hain.
-              </p>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
-    </div>
+    </>
   )
 }
