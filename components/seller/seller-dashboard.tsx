@@ -1,12 +1,12 @@
-"use client"
-
-export function SellerDashboard() {
+export default function SellerDashboardPage() {
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold mb-8">Seller Dashboard</h1>
-      <div className="bg-muted p-8 rounded-lg text-center">
-        <p className="text-muted-foreground">Seller dashboard coming soon</p>
-      </div>
+    <div className="p-10 text-center">
+      <h1 className="text-2xl font-bold text-orange-600">
+        Seller Portal Working!
+      </h1>
+      <p className="mt-4">
+        Dashboard page bhi theek ho gaya.
+      </p>
     </div>
   )
 }
