@@ -1,14 +1,12 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useSellerLang } from "@/lib/seller-language"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import Link from "next/link"
 import { Package, ShoppingBag, Wallet, Plus } from "lucide-react"
 
 export default function SellerPage() {
-  const { t } = useSellerLang()
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [loading, setLoading] = useState(true)
 
@@ -19,27 +17,27 @@ export default function SellerPage() {
   }, [])
 
   if (loading) {
-    return <div className="text-center py-20">{t("loading")}</div>
+    return <div className="text-center py-20">Loading...</div>
   }
 
   if (!isLoggedIn) {
     return (
       <div className="max-w-md mx-auto mt-10 space-y-6">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">{t("loginTitle")}</h2>
-          <p className="text-muted-foreground">Local shopkeepers ke liye simple portal</p>
+          <h2 className="text-2xl font-bold mb-2">Seller Login</h2>
+          <p className="text-gray-500">Local shopkeepers ke liye simple portal</p>
         </div>
 
         <Card>
           <CardContent className="p-6 space-y-4">
             <Link href="/seller/login">
               <Button className="w-full h-12 text-base bg-[#FF6B00] hover:bg-[#E65C00]">
-                {t("login")}
+                Login
               </Button>
             </Link>
             <Link href="/seller/signup">
               <Button variant="outline" className="w-full h-12 text-base">
-                {t("signup")}
+                Create Seller Account
               </Button>
             </Link>
           </CardContent>
@@ -50,7 +48,7 @@ export default function SellerPage() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">{t("dashboard")}</h2>
+      <h2 className="text-2xl font-bold">Dashboard</h2>
 
       <div className="grid grid-cols-1 gap-4">
         <Link href="/seller/orders">
@@ -60,8 +58,8 @@ export default function SellerPage() {
                 <ShoppingBag className="h-6 w-6 text-[#FF6B00]" />
               </div>
               <div>
-                <p className="font-semibold text-lg">{t("todayOrders")}</p>
-                <p className="text-sm text-muted-foreground">Dekho aaj ke orders</p>
+                <p className="font-semibold text-lg">Today's Orders</p>
+                <p className="text-sm text-gray-500">Dekho aaj ke orders</p>
               </div>
             </CardContent>
           </Card>
@@ -74,8 +72,8 @@ export default function SellerPage() {
                 <Package className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <p className="font-semibold text-lg">{t("yourProducts")}</p>
-                <p className="text-sm text-muted-foreground">Apna maal manage karo</p>
+                <p className="font-semibold text-lg">Your Products</p>
+                <p className="text-sm text-gray-500">Apna maal manage karo</p>
               </div>
             </CardContent>
           </Card>
@@ -88,8 +86,8 @@ export default function SellerPage() {
                 <Wallet className="h-6 w-6 text-green-600" />
               </div>
               <div>
-                <p className="font-semibold text-lg">{t("earnings")}</p>
-                <p className="text-sm text-muted-foreground">Hisab-kitab</p>
+                <p className="font-semibold text-lg">Earnings</p>
+                <p className="text-sm text-gray-500">Hisab-kitab</p>
               </div>
             </CardContent>
           </Card>
@@ -99,7 +97,7 @@ export default function SellerPage() {
       <Link href="/seller/products/add">
         <Button className="w-full h-14 text-lg bg-[#FF6B00] hover:bg-[#E65C00] mt-4">
           <Plus className="h-5 w-5 mr-2" />
-          {t("addProduct")}
+          Add Product
         </Button>
       </Link>
     </div>
