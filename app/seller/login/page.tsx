@@ -2,10 +2,10 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Store, Phone, Lock } from "lucide-react"
+import { toast } from "sonner"
 
 export default function SellerLoginPage() {
   const router = useRouter()
@@ -14,7 +14,7 @@ export default function SellerLoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
-  const handleLogin = async () => {
+  const handleLogin = () => {
     setError("")
 
     if (!phone.trim() || !password) {
@@ -25,38 +25,28 @@ export default function SellerLoginPage() {
     setLoading(true)
 
     try {
-      const pseudoEmail = `${phone.trim()}@smartbazaar.seller`
+      const saved = localStorage.getItem("seller_data")
 
-      const { data, error: loginError } = await supabase.auth.signInWithPassword({
-        email: pseudoEmail,
-        password,
-      })
-
-      if (loginError) {
-        setError("Invalid phone or password")
+      if (!saved) {
+        setError("No account found. Please signup first.")
         setLoading(false)
         return
       }
 
-      if (data.user) {
-        const { data: profile } = await supabase
-          .from("users")
-          .select("is_seller")
-          .eq("id", data.user.id)
-          .single()
+      const seller = JSON.parse(saved)
 
-        if (!profile?.is_seller) {
-          setError("This account is not registered as a seller")
-          await supabase.auth.signOut()
-          setLoading(false)
-          return
-        }
+      // Phone compare (spaces / extra digits ignore)
+      const savedPhone = String(seller.phone || "").replace(/\s/g, "")
+      const inputPhone = phone.trim().replace(/\s/g, "")
+
+      if (savedPhone === inputPhone && seller.password === password) {
+        toast.success("Login successful!")
+        router.push("/seller/dashboard")
+      } else {
+        setError("Invalid phone or password")
       }
-
-      router.push("/seller/dashboard")
     } catch (err) {
-      console.error("Seller login error:", err)
-      setError("Something went wrong. Please try again.")
+      setError("Something went wrong")
     } finally {
       setLoading(false)
     }
@@ -103,14 +93,14 @@ export default function SellerLoginPage() {
       <Button
         onClick={handleLogin}
         disabled={loading}
-        className="mt-6 w-full py-6 text-base font-semibold"
+        className="mt-6 w-full py-6 text-base font-semibold bg-[#FF6B00] hover:bg-[#E65C00]"
       >
         {loading ? "Logging in..." : "Log in"}
       </Button>
 
       <p className="text-center text-xs text-muted-foreground mt-4">
         New shop?{" "}
-        <a href="/seller/signup" className="text-primary font-medium">
+        <a href="/seller/signup" className="text-[#FF6B00] font-medium">
           Create an account
         </a>
       </p>
