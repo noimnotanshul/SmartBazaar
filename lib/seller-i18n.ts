@@ -123,4 +123,4 @@ export const translations = {
   },
 }
 
-export type TranslationKey = keyof typeof translations.en0
+export type TranslationKey = keyof typeof translations.en
